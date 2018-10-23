@@ -1,0 +1,13 @@
+let
+integer x, s.
+in
+s := 0;
+read x;
+while 1 - (x = 0) do
+	if x = (x/2)*2 then
+		s := s + x;
+	fi;
+	read x;
+end;
+write s;
+end

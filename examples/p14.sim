@@ -1,0 +1,9 @@
+let
+integer x.
+in
+x := 5;
+while x < 35 do
+	write x;
+	x := x + 1;
+end;
+end

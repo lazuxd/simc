@@ -1,0 +1,7 @@
+let
+integer x, y;
+in
+x := 1;
+y := x-3;
+write x+y;
+end

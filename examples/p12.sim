@@ -1,0 +1,17 @@
+let
+integer x, y, z, m.
+in
+read x;
+read y;
+read z;
+if x < y then
+	m := y;
+else
+	m := x;
+fi;
+if m < z then
+	write z;
+else
+	write m;
+fi;
+end

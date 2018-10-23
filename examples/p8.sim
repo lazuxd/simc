@@ -1,0 +1,7 @@
+let
+integer x,y.
+in
+x := 10;
+y := 5;
+write x+y;
+end

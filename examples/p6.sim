@@ -1,0 +1,6 @@
+let
+integer x.
+in
+x := 10;
+write x;
+end;

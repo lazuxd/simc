@@ -1,0 +1,11 @@
+let
+integer x, s.
+in
+s := 0;
+read x;
+while 1 - (x = 0) do
+	s := s + x;
+	read x;
+end;
+write s;
+end

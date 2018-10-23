@@ -1,0 +1,6 @@
+let
+integer x.
+in
+x := 35 + 10 / 2 - 1 + 0 * x;
+write x;
+end;

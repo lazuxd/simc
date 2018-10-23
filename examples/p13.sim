@@ -1,0 +1,17 @@
+let
+integer x, i, j, a.
+in
+read x;
+if x < 3 then
+	write 1;
+fi;
+i := 1;
+j := 1;
+while x > 2 do
+	x := x - 1;
+	a := i;
+	i := j;
+	j := j + a;
+end;
+write j;
+end
