@@ -1,21 +1,32 @@
 %{
-    #include "token_classes.h"
+    #include "y.tab.h"
 %}
 
 %option yylineno
 
 %%
 
-"let"|"in"|"end"|"integer"|"skip"|"if"|"then"|"else"|"fi"|"while"|"do"|"read"|"write"       return KEYWORD;
-[0-9]+                                                                                      return NUMBER;
-[a-zA-Z]+[0-9]*                                                                             return IDENTIFIER;
-[ \t\n]+                                                                                    return WHITESPACE;
-[,.;]                                                                                       return PUNCTUATION;
-[()]                                                                                        return PARANTHESIS;
-":="                                                                                        return ASSIGNMENT;
-[+\-*/^]                                                                                     return ARITHMETIC;
-[=<>]                                                                                       return COMPARISON;
-.                                                                                           return ERROR;
+"let"                       {return k_let;}
+"in"                        {return k_in;}
+"end"                       {return k_end;}
+"integer"                   {return k_integer;}
+"skip"                      {return k_skip;}
+"if"                        {return k_if;}
+"then"                      {return k_then;}
+"else"                      {return k_else;}
+"fi"                        {return k_fi;}
+"while"                     {return k_while;}
+"do"                        {return k_do;}
+"read"                      {return k_read;}
+"write"                     {return k_write;}
+":="                        {return assign;}
+[0-9]+                      {return number;}
+[a-zA-Z]+[0-9]*             {return identifier;}
+[ \t\n]+                    ;
+.                           {
+                                printf("Syntax error near line %d. Unexpected token: %s\n", yylineno, yytext);
+                                exit(1);
+                            }
 
 %%
 
