@@ -20,8 +20,8 @@
 "read"                      {return k_read;}
 "write"                     {return k_write;}
 ":="                        {return assign;}
-[0-9]+                      {return number;}
-[a-zA-Z]+[0-9]*             {return identifier;}
+[0-9]+                      {yylval.number = atoi(yytext); return number;}
+[a-zA-Z]+[0-9]*             {yylval.string = yytext; return identifier;}
 [ \t\n]+                    ;
 .                           {
                                 printf("Syntax error near line %d. Unexpected token: %s\n", yylineno, yytext);

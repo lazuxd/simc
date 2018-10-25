@@ -49,15 +49,15 @@ extern int yydebug;
     k_in = 259,
     k_end = 260,
     k_integer = 261,
-    k_skip = 262,
-    k_if = 263,
-    k_then = 264,
-    k_else = 265,
-    k_fi = 266,
-    k_while = 267,
-    k_do = 268,
-    k_read = 269,
-    k_write = 270,
+    k_if = 262,
+    k_then = 263,
+    k_else = 264,
+    k_fi = 265,
+    k_while = 266,
+    k_do = 267,
+    k_read = 268,
+    k_write = 269,
+    k_skip = 270,
     assign = 271,
     number = 272,
     identifier = 273
@@ -68,22 +68,36 @@ extern int yydebug;
 #define k_in 259
 #define k_end 260
 #define k_integer 261
-#define k_skip 262
-#define k_if 263
-#define k_then 264
-#define k_else 265
-#define k_fi 266
-#define k_while 267
-#define k_do 268
-#define k_read 269
-#define k_write 270
+#define k_if 262
+#define k_then 263
+#define k_else 264
+#define k_fi 265
+#define k_while 266
+#define k_do 267
+#define k_read 268
+#define k_write 269
+#define k_skip 270
 #define assign 271
 #define number 272
 #define identifier 273
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+
+union YYSTYPE
+{
+#line 13 "parser.y" /* yacc.c:1909  */
+
+    int number;
+    char* string;
+    struct si_node si_node;
+    struct exp_node exp_node;
+    struct cmd_node cmd_node;
+
+#line 98 "y.tab.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
