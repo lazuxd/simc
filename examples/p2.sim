@@ -1,4 +1,6 @@
 let
-integer x.
+integer x, y.
 in
+x := y + 1;
+write x;
 end

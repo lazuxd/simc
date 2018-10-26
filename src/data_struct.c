@@ -1,4 +1,6 @@
 #include "data_struct.h"
+#define DUPLICATE_VAR "Semantic error near line %d in file '%s'. Variable '%s' declared multiple times.\n"
+extern int yylineno;
 
 // Hash table
 
@@ -29,11 +31,17 @@ int add_var(struct si_node** var_arr, int n, char* var_name, int var_num) {
     } else {
         struct si_node * t = var_arr[i];
         if (strncmp(t->s, var_name, strlen(var_name)) == 0) {
+            fprintf(stderr, DUPLICATE_VAR, yylineno, filename, var_name);
+            free_resources();
+            exit(EXIT_FAILURE);
             return -1;
         }
         while (t->next != NULL) {
             t = t->next;
             if (strncmp(t->s, var_name, strlen(var_name)) == 0) {
+                fprintf(stderr, DUPLICATE_VAR, yylineno, filename, var_name);
+                free_resources();
+                exit(EXIT_FAILURE);
                 return -1;
             }
         }
@@ -124,8 +132,56 @@ struct exp_node * new_node_from_op(char op, struct exp_node * l, struct exp_node
     t->r = r;
     return t;
 }
+void delete_exp(struct exp_node * t) {
+    if (t == NULL) return;
+    delete_exp(t->l);
+    delete_exp(t->r);
+    if (t->type == IDENTIFIER) {
+        free(t->id);
+    }
+    free(t);
+}
 int eval(struct exp_node* exp) {
-    // TODO
+    if (exp->type == NUMBER) return exp->num;
+    if (exp->type == IDENTIFIER) {
+        int num;
+        get_var(var_table, TABLE_SIZE, exp->id, &num);
+        return num;
+    }
+    int a, b, c;
+    a = eval(exp->l);
+    b = eval(exp->r);
+    switch (exp->op) {
+        case '+':
+            c = a + b;
+            break;
+        case '-':
+            c = a - b;
+            break;
+        case '*':
+            c = a * b;
+            break;
+        case '/':
+            c = a / b;
+            break;
+        case '^':
+            for (int i = 0, c = 1; i < b; i++) {
+                c *= a;
+            }
+            break;
+        case '=':
+            c = a == b;
+            break;
+        case '<':
+            c = a < b;
+            break;
+        case '>':
+            c = a > b;
+            break;
+        default:
+            fprintf(stderr, "Error: Unknown operator.\n");
+    }
+    return c;
 }
 
 
@@ -151,7 +207,9 @@ struct cmd_node * new_while(struct exp_node * exp, struct cmd_node * cmd_list) {
 struct cmd_node * new_assign(char* identifier, struct exp_node* exp) {
     struct cmd_node * t = (struct cmd_node *) malloc(sizeof(struct cmd_node));
     t->type = ASSIGN;
-    t->_assign_.identifier = identifier;
+    int l = strlen(identifier)+1;
+    t->_assign_.identifier = (char*) malloc(l);
+    strncpy(t->_assign_.identifier, identifier, l);
     t->_assign_.exp = exp;
     t->next = NULL;
     return t;
@@ -159,7 +217,9 @@ struct cmd_node * new_assign(char* identifier, struct exp_node* exp) {
 struct cmd_node * new_read(char* identifier) {
     struct cmd_node * t = (struct cmd_node *) malloc(sizeof(struct cmd_node));
     t->type = READ;
-    t->_read_.identifier = identifier;
+    int l = strlen(identifier)+1;
+    t->_read_.identifier = (char*) malloc(l);
+    strncpy(t->_read_.identifier, identifier, l);
     t->next = NULL;
     return t;
 }
@@ -176,6 +236,62 @@ struct cmd_node * new_skip() {
     t->next = NULL;
     return t;
 }
-void exec(struct cmd_node * cmd_list) {
-
+void delete_cmd_list(struct cmd_node * t) {
+    if (t == NULL) return;
+    delete_cmd_list(t->next);
+    switch (t->type) {
+        case IF:
+            delete_exp(t->_if_.exp);
+            delete_cmd_list(t->_if_.cmd_list1);
+            delete_cmd_list(t->_if_.cmd_list2);
+            break;
+        case WHILE:
+            delete_exp(t->_while_.exp);
+            delete_cmd_list(t->_while_.cmd_list);
+            break;
+        case ASSIGN:
+            free(t->_assign_.identifier);
+            delete_exp(t->_assign_.exp);
+            break;
+        case READ:
+            free(t->_read_.identifier);
+            break;
+        case WRITE:
+            delete_exp(t->_write_.exp);
+            break;
+        case SKIP:
+            break;
+    }
+    free(t);
+}
+void exec(struct cmd_node * t) {
+    if (t == NULL) return;
+    switch (t->type) {
+        case IF:
+            if (eval(t->_if_.exp)) exec(t->_if_.cmd_list1);
+            else exec(t->_if_.cmd_list2);
+            break;
+        case WHILE:
+            while (eval(t->_while_.exp))
+                exec(t->_while_.cmd_list);
+            break;
+        case ASSIGN:
+            update_var(var_table, TABLE_SIZE, t->_assign_.identifier, eval(t->_assign_.exp));
+            break;
+        case READ:
+            {
+                int num;
+                scanf("%d", &num);
+                update_var(var_table, TABLE_SIZE, t->_read_.identifier, num);
+            }
+            break;
+        case WRITE:
+            printf("%d\n", eval(t->_write_.exp));
+            break;
+        case SKIP:
+            break;
+        default:
+            fprintf(stderr, "Error: Unknown command\n");
+    }
+    exec(t->next);
 }

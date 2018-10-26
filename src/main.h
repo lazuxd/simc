@@ -3,3 +3,5 @@
 
 extern struct si_node* var_table[TABLE_SIZE];
 extern struct cmd_node* cmd_list;
+extern char* filename;
+extern void free_resources();

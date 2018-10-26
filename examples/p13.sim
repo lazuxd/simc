@@ -4,6 +4,8 @@ in
 read x;
 if x < 3 then
 	write 1;
+else
+    skip;
 fi;
 i := 1;
 j := 1;

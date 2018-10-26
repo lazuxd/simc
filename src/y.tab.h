@@ -88,11 +88,11 @@ union YYSTYPE
 {
 #line 13 "parser.y" /* yacc.c:1909  */
 
-    int number;
-    char* string;
-    struct si_node si_node;
-    struct exp_node exp_node;
-    struct cmd_node cmd_node;
+    int integer;
+    char string[50];
+    struct si_node* p_si_node;
+    struct exp_node* p_exp_node;
+    struct cmd_node* p_cmd_node;
 
 #line 98 "y.tab.h" /* yacc.c:1909  */
 };

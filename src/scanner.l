@@ -1,5 +1,8 @@
 %{
+    #include "data_struct.h"
     #include "y.tab.h"
+    extern char* filename;
+    extern void free_resources();
 %}
 
 %option yylineno
@@ -20,11 +23,25 @@
 "read"                      {return k_read;}
 "write"                     {return k_write;}
 ":="                        {return assign;}
-[0-9]+                      {yylval.number = atoi(yytext); return number;}
-[a-zA-Z]+[0-9]*             {yylval.string = yytext; return identifier;}
+[0-9]+                      {yylval.integer = atoi(yytext); return number;}
+[a-zA-Z]+[0-9]*             {strncpy(yylval.string, yytext, strlen(yytext)+1); return identifier;}
+","                         {return ',';}
+";"                         {return ';';}
+"."                         {return '.';}
+"="                         {return '=';}
+"<"                         {return '<';}
+">"                         {return '>';}
+"+"                         {return '+';}
+"-"                         {return '-';}
+"*"                         {return '*';}
+"/"                         {return '/';}
+"^"                         {return '^';}
+"("                         {return '(';}
+")"                         {return ')';}
 [ \t\n]+                    ;
 .                           {
-                                printf("Syntax error near line %d. Unexpected token: %s\n", yylineno, yytext);
+                                fprintf(stderr, "Syntax error near line %d in file '%s'. Unexpected token: %s\n", yylineno, filename, yytext);
+                                free_resources();
                                 exit(1);
                             }
 

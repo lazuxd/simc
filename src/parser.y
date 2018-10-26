@@ -11,11 +11,11 @@
 %}
 
 %union {
-    int number;
-    char* string;
-    struct si_node si_node;
-    struct exp_node exp_node;
-    struct cmd_node cmd_node;
+    int integer;
+    char string[50];
+    struct si_node* p_si_node;
+    struct exp_node* p_exp_node;
+    struct cmd_node* p_cmd_node;
 }
 %start PROGRAM
 %token k_let k_in k_end k_integer
@@ -24,10 +24,10 @@
 %token k_read k_write
 %token k_skip
 %token assign
-%token <number> number
+%token <integer> number
 %token <string> identifier
-%type <exp_node*> E T3 T2 T1 T
-%type <cmd_node*> COMMAND COMMAND_LIST
+%type <p_exp_node> E T3 T2 T1 T
+%type <p_cmd_node> COMMAND COMMAND_LIST
 
 %%
 
@@ -48,8 +48,22 @@ COMMAND_LIST        : COMMAND ';' COMMAND_LIST                                  
 
 COMMAND             : k_if E k_then COMMAND_LIST k_else COMMAND_LIST k_fi               {$$ = new_if($2, $4, $6);}
                     | k_while E k_do COMMAND_LIST k_end                                 {$$ = new_while($2, $4);}
-                    | identifier assign E                                               {$$ = new_assign($1, $3);}
-                    | k_read identifier                                                 {$$ = new_read($2);}
+                    | identifier assign E                                               {   
+                                                                                            if (!exist_var(var_table, TABLE_SIZE, $1)) {
+                                                                                                fprintf(stderr, "Semantic error near line %d in file '%s'. A value is assigned to '%s' but this variable is not declared.\n", yylineno, filename, $1);
+                                                                                                free_resources();
+                                                                                                exit(1);
+                                                                                            }
+                                                                                            $$ = new_assign($1, $3);
+                                                                                        }
+                    | k_read identifier                                                 {
+                                                                                            if (!exist_var(var_table, TABLE_SIZE, $2)) {
+                                                                                                fprintf(stderr, "Semantic error near line %d in file '%s'. A value is assigned to '%s' but this variable is not declared.\n", yylineno, filename, $2);
+                                                                                                free_resources();
+                                                                                                exit(1);
+                                                                                            }
+                                                                                            $$ = new_read($2);
+                                                                                        }
                     | k_write E                                                         {$$ = new_write($2);}
                     | k_skip                                                            {$$ = new_skip();}
                     ;
@@ -60,31 +74,30 @@ E                   : T3                                                        
                     | T3 '>' T3                                                         {$$ = new_node_from_op('>', $1, $3);}
                     ;
 
-T3                  : T2 '+' T3                                                         {$$ = new_node_from_op('+', $1, $3);}
-                    | T2 '-' T3                                                         {$$ = new_node_from_op('-', $1, $3);}
+T3                  : T3 '+' T2                                                         {$$ = new_node_from_op('+', $1, $3);}
+                    | T3 '-' T2                                                         {$$ = new_node_from_op('-', $1, $3);}
                     | T2                                                                {$$ = $1;}
                     ;
 
-T2                  : T1 '*' T2                                                         {$$ = new_node_from_op('*', $1, $3);}
-                    | T1 '/' T2                                                         {$$ = new_node_from_op('/', $1, $3);}
+T2                  : T2 '*' T1                                                         {$$ = new_node_from_op('*', $1, $3);}
+                    | T2 '/' T1                                                         {$$ = new_node_from_op('/', $1, $3);}
                     | T1                                                                {$$ = $1;}
                     ;
 
-T1                  : T '^' T1                                                          {$$ = new_node_from_op('^', $1, $3);}
+T1                  : T1 '^' T                                                          {$$ = new_node_from_op('^', $1, $3);}
                     | T                                                                 {$$ = $1;}
                     ;
 
 T                   : number                                                            {$$ = new_node_from_num($1);}
-                    | identifier                                                        {$$ = new_node_from_id($1);}
+                    | identifier                                                        {
+                                                                                            if (!exist_var(var_table, TABLE_SIZE, $1)) {
+                                                                                                fprintf(stderr, "Semantic error near line %d in file '%s'. Variable '%s' is used but not declared.\n", yylineno, filename, $1);
+                                                                                                free_resources();
+                                                                                                exit(1);
+                                                                                            }
+                                                                                            $$ = new_node_from_id($1);
+                                                                                        }
                     | '(' E ')'                                                         {$$ = $2;}
                     ;
 
 %%
-
-void yyerror(const char * s) {
-    fprintf(stderr, "%s\n", s);
-}
-
-int main(void) {
-    return yyparse();
-}

@@ -6,6 +6,8 @@ read x;
 while 1 - (x = 0) do
 	if x = (x/2)*2 then
 		s := s + x;
+    else
+        skip;
 	fi;
 	read x;
 end;
