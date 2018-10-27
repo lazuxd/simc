@@ -8,6 +8,7 @@ int num(char c) {
     if (c >= '0' && c <= '9') return c-'0';
     else if (c >= 'a' && c <= 'z') return c-'a'+10;
     else if (c >= 'A' && c <= 'Z') return c-'A'+36;
+    else return 62;
 }
 int hash(const char * s, int n) {
     unsigned int h = 0;
@@ -165,8 +166,11 @@ int eval(struct exp_node* exp) {
             c = a / b;
             break;
         case '^':
-            for (int i = 0, c = 1; i < b; i++) {
-                c *= a;
+            {
+                c = 1;
+                for (int i = 0; i < b; i++) {
+                    c *= a;
+                }
             }
             break;
         case '=':

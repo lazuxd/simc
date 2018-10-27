@@ -1,0 +1,7 @@
+let
+    integer x, y.
+in
+    read x;
+    read y;
+    write x^y;
+end

@@ -474,9 +474,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    34,    34,    37,    38,    41,    42,    45,    46,    49,
-      50,    51,    59,    67,    68,    71,    72,    73,    74,    77,
-      78,    79,    82,    83,    84,    87,    88,    91,    92,   100
+       0,    34,    34,    37,    38,    41,    48,    57,    58,    61,
+      62,    63,    71,    79,    80,    83,    84,    85,    86,    89,
+      90,    91,    94,    95,    96,    99,   100,   103,   116,   124
 };
 #endif
 
@@ -1302,42 +1302,54 @@ yyreduce:
 
   case 5:
 #line 41 "parser.y" /* yacc.c:1646  */
-    {add_var(var_table, TABLE_SIZE, (yyvsp[0].string), 0);}
-#line 1307 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 6:
-#line 42 "parser.y" /* yacc.c:1646  */
-    {add_var(var_table, TABLE_SIZE, (yyvsp[-2].string), 0);}
+    {
+                                                                                            add_var(var_table, TABLE_SIZE, (yyvsp[0].string), mode == INTERPRETER ? 0 : var_count++);
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                strcpy(var_str+var_str_next, ", 0");
+                                                                                                var_str_next += 3;
+                                                                                            }
+                                                                                        }
 #line 1313 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 7:
-#line 45 "parser.y" /* yacc.c:1646  */
-    {(yyvsp[-2].p_cmd_node)->next = (yyvsp[0].p_cmd_node); (yyval.p_cmd_node) = (yyvsp[-2].p_cmd_node);}
-#line 1319 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 8:
-#line 46 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_cmd_node) = new_skip();}
+  case 6:
+#line 48 "parser.y" /* yacc.c:1646  */
+    {
+                                                                                            add_var(var_table, TABLE_SIZE, (yyvsp[-2].string), mode == INTERPRETER ? 0 : var_count++);
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                strcpy(var_str+var_str_next, ", 0");
+                                                                                                var_str_next += 3;
+                                                                                            }
+                                                                                        }
 #line 1325 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 49 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_cmd_node) = new_if((yyvsp[-5].p_exp_node), (yyvsp[-3].p_cmd_node), (yyvsp[-1].p_cmd_node));}
+  case 7:
+#line 57 "parser.y" /* yacc.c:1646  */
+    {(yyvsp[-2].p_cmd_node)->next = (yyvsp[0].p_cmd_node); (yyval.p_cmd_node) = (yyvsp[-2].p_cmd_node);}
 #line 1331 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 10:
-#line 50 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_cmd_node) = new_while((yyvsp[-3].p_exp_node), (yyvsp[-1].p_cmd_node));}
+  case 8:
+#line 58 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_cmd_node) = new_skip();}
 #line 1337 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 9:
+#line 61 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_cmd_node) = new_if((yyvsp[-5].p_exp_node), (yyvsp[-3].p_cmd_node), (yyvsp[-1].p_cmd_node));}
+#line 1343 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 62 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_cmd_node) = new_while((yyvsp[-3].p_exp_node), (yyvsp[-1].p_cmd_node));}
+#line 1349 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 11:
-#line 51 "parser.y" /* yacc.c:1646  */
+#line 63 "parser.y" /* yacc.c:1646  */
     {   
                                                                                             if (!exist_var(var_table, TABLE_SIZE, (yyvsp[-2].string))) {
                                                                                                 fprintf(stderr, "Semantic error near line %d in file '%s'. A value is assigned to '%s' but this variable is not declared.\n", yylineno, filename, (yyvsp[-2].string));
@@ -1346,11 +1358,11 @@ yyreduce:
                                                                                             }
                                                                                             (yyval.p_cmd_node) = new_assign((yyvsp[-2].string), (yyvsp[0].p_exp_node));
                                                                                         }
-#line 1350 "y.tab.c" /* yacc.c:1646  */
+#line 1362 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 59 "parser.y" /* yacc.c:1646  */
+#line 71 "parser.y" /* yacc.c:1646  */
     {
                                                                                             if (!exist_var(var_table, TABLE_SIZE, (yyvsp[0].string))) {
                                                                                                 fprintf(stderr, "Semantic error near line %d in file '%s'. A value is assigned to '%s' but this variable is not declared.\n", yylineno, filename, (yyvsp[0].string));
@@ -1359,101 +1371,113 @@ yyreduce:
                                                                                             }
                                                                                             (yyval.p_cmd_node) = new_read((yyvsp[0].string));
                                                                                         }
-#line 1363 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 13:
-#line 67 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_cmd_node) = new_write((yyvsp[0].p_exp_node));}
-#line 1369 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 68 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_cmd_node) = new_skip();}
 #line 1375 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 71 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
+  case 13:
+#line 79 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_cmd_node) = new_write((yyvsp[0].p_exp_node));}
 #line 1381 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 72 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('=', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 14:
+#line 80 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_cmd_node) = new_skip();}
 #line 1387 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 73 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('<', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 15:
+#line 83 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
 #line 1393 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 74 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('>', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 16:
+#line 84 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('=', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1399 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 77 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('+', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 17:
+#line 85 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('<', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1405 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 78 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('-', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 18:
+#line 86 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('>', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1411 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 79 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
+  case 19:
+#line 89 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('+', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1417 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 82 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('*', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 20:
+#line 90 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('-', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1423 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 83 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('/', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 21:
+#line 91 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
 #line 1429 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 84 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
+  case 22:
+#line 94 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('*', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1435 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 87 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_op('^', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
+  case 23:
+#line 95 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('/', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1441 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 88 "parser.y" /* yacc.c:1646  */
+  case 24:
+#line 96 "parser.y" /* yacc.c:1646  */
     {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
 #line 1447 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 91 "parser.y" /* yacc.c:1646  */
-    {(yyval.p_exp_node) = new_node_from_num((yyvsp[0].integer));}
+  case 25:
+#line 99 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = new_node_from_op('^', (yyvsp[-2].p_exp_node), (yyvsp[0].p_exp_node));}
 #line 1453 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 26:
+#line 100 "parser.y" /* yacc.c:1646  */
+    {(yyval.p_exp_node) = (yyvsp[0].p_exp_node);}
+#line 1459 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 103 "parser.y" /* yacc.c:1646  */
+    {
+                                                                                            (yyval.p_exp_node) = new_node_from_num((yyvsp[0].integer));
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                char * s = i2s((yyvsp[0].integer));
+                                                                                                if (!exist_var(var_table, TABLE_SIZE, s)) {
+                                                                                                    add_var(var_table, TABLE_SIZE, s, var_count++);
+                                                                                                    var_str[var_str_next++] = ',';
+                                                                                                    var_str[var_str_next++] = ' ';
+                                                                                                    strcpy(var_str+var_str_next, s);
+                                                                                                    var_str_next += strlen(s);
+                                                                                                }
+                                                                                            }
+                                                                                        }
+#line 1477 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 28:
-#line 92 "parser.y" /* yacc.c:1646  */
+#line 116 "parser.y" /* yacc.c:1646  */
     {
                                                                                             if (!exist_var(var_table, TABLE_SIZE, (yyvsp[0].string))) {
                                                                                                 fprintf(stderr, "Semantic error near line %d in file '%s'. Variable '%s' is used but not declared.\n", yylineno, filename, (yyvsp[0].string));
@@ -1462,17 +1486,17 @@ yyreduce:
                                                                                             }
                                                                                             (yyval.p_exp_node) = new_node_from_id((yyvsp[0].string));
                                                                                         }
-#line 1466 "y.tab.c" /* yacc.c:1646  */
+#line 1490 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 100 "parser.y" /* yacc.c:1646  */
+#line 124 "parser.y" /* yacc.c:1646  */
     {(yyval.p_exp_node) = (yyvsp[-1].p_exp_node);}
-#line 1472 "y.tab.c" /* yacc.c:1646  */
+#line 1496 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1476 "y.tab.c" /* yacc.c:1646  */
+#line 1500 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1700,5 +1724,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 103 "parser.y" /* yacc.c:1906  */
+#line 127 "parser.y" /* yacc.c:1906  */
 

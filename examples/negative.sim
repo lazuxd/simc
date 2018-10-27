@@ -1,0 +1,7 @@
+let
+    integer x, y.
+in
+    x := -9;
+    read y;
+    write x+y;
+end

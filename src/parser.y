@@ -38,8 +38,20 @@ DECL                : k_integer ID_LIST '.'                                     
                     | /*empty*/                                                         {;}
                     ;
 
-ID_LIST             : identifier                                                        {add_var(var_table, TABLE_SIZE, $1, 0);}
-                    | identifier ',' ID_LIST                                            {add_var(var_table, TABLE_SIZE, $1, 0);}
+ID_LIST             : identifier                                                        {
+                                                                                            add_var(var_table, TABLE_SIZE, $1, mode == INTERPRETER ? 0 : var_count++);
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                strcpy(var_str+var_str_next, ", 0");
+                                                                                                var_str_next += 3;
+                                                                                            }
+                                                                                        }
+                    | identifier ',' ID_LIST                                            {
+                                                                                            add_var(var_table, TABLE_SIZE, $1, mode == INTERPRETER ? 0 : var_count++);
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                strcpy(var_str+var_str_next, ", 0");
+                                                                                                var_str_next += 3;
+                                                                                            }
+                                                                                        }
                     ;
 
 COMMAND_LIST        : COMMAND ';' COMMAND_LIST                                          {$1->next = $3; $$ = $1;}
@@ -88,7 +100,19 @@ T1                  : T1 '^' T                                                  
                     | T                                                                 {$$ = $1;}
                     ;
 
-T                   : number                                                            {$$ = new_node_from_num($1);}
+T                   : number                                                            {
+                                                                                            $$ = new_node_from_num($1);
+                                                                                            if (mode != INTERPRETER) {
+                                                                                                char * s = i2s($1);
+                                                                                                if (!exist_var(var_table, TABLE_SIZE, s)) {
+                                                                                                    add_var(var_table, TABLE_SIZE, s, var_count++);
+                                                                                                    var_str[var_str_next++] = ',';
+                                                                                                    var_str[var_str_next++] = ' ';
+                                                                                                    strcpy(var_str+var_str_next, s);
+                                                                                                    var_str_next += strlen(s);
+                                                                                                }
+                                                                                            }
+                                                                                        }
                     | identifier                                                        {
                                                                                             if (!exist_var(var_table, TABLE_SIZE, $1)) {
                                                                                                 fprintf(stderr, "Semantic error near line %d in file '%s'. Variable '%s' is used but not declared.\n", yylineno, filename, $1);

@@ -23,7 +23,7 @@
 "read"                      {return k_read;}
 "write"                     {return k_write;}
 ":="                        {return assign;}
-[0-9]+                      {yylval.integer = atoi(yytext); return number;}
+[+-]?[0-9]+                 {yylval.integer = atoi(yytext); return number;}
 [a-zA-Z]+[0-9]*             {strncpy(yylval.string, yytext, strlen(yytext)+1); return identifier;}
 ","                         {return ',';}
 ";"                         {return ';';}

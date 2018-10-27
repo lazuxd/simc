@@ -1,0 +1,16 @@
+let
+    integer n, a, b, c.
+in
+    a := 0;
+    b := 1;
+    read n;
+    if n > -1 then write 0; else skip; fi;
+    if n > 0 then write 1; else skip; fi;
+    while n > 1 do
+        n := n - 1;
+        c := b;
+        b := a + b;
+        a := c;
+        write b;
+    end;
+end
